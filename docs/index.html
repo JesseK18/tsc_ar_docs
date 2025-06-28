@@ -2,49 +2,269 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Interactive Plots – Adversarial Robustness in Time-Series Classification</title>
+    <title>Interactive Plots – Robustness in Time-Series Classification</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            background: #f9f9fb;
-            color: #222;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
         }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin: 20px 0;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         h1 {
-            color: #1976d2;
+            color: #4a5568;
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: #718096;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+        
+        h2 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            position: relative;
+            font-weight: 600;
+        }
+        
+        h2::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: #764ba2;
+            border-radius: 2px;
+        }
+        
+        h3 {
+            color: #4a5568;
+            font-size: 1.3em;
+            margin: 25px 0 15px 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        h3::before {
+            content: '▶';
+            color: #667eea;
+            margin-right: 10px;
+            font-size: 0.8em;
+        }
+        
         ul {
-            line-height: 2;
-            font-size: 1.1em;
+            list-style: none;
+            margin: 0 0 30px 20px;
         }
+        
+        li {
+            margin: 12px 0;
+            position: relative;
+        }
+        
         a {
-            color: #1565c0;
+            color: #4a5568;
             text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            padding: 15px 20px;
+            display: block;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
         a:hover {
-            text-decoration: underline;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
+        
+        a:hover::before {
+            left: 100%;
+        }
+        
+        a:active {
+            transform: translateY(0);
+        }
+        
+        .dataset-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .dataset-section:hover {
+            transform: translateY(-2px);
+        }
+        
         .caption {
-            margin-top: 1.5em;
-            color: #777;
+            margin-top: 50px;
+            padding: 25px;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: white;
+            text-align: center;
+            border-radius: 15px;
+            font-size: 1.1em;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .caption a {
+            color: #90cdf4;
+            background: none;
+            padding: 0;
+            display: inline;
+            border-radius: 0;
+            font-weight: 600;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+        
+        .caption a:hover {
+            color: #63b3ed;
+            transform: none;
+            box-shadow: none;
+            background: none;
+        }
+        
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 25px;
+                margin: 10px 0;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+            
+            .dataset-section {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Interactive Plotly Visualizations</h1>
-    <p>This page hosts interactive plots for the thesis <b>“Robustness in Time-Series Classification”</b>. Click any link to open the plot in a new tab.</p>
+    <div class="container">
+        <h1>Interactive t-SNE Visualizations</h1>
+        <p class="subtitle">This page hosts interactive plots for the thesis <b>"Evaluating Adversarial Robustness in Time-Series Classification: A Comparative Study on Self-Supervised Learning Models"</b> by Jesse Kroll.</p>
 
-    <ul>
-        <li><a href="tsne3d_plot.html" target="_blank">3D t-SNE of Embeddings (click to open)</a></li>
-        <!-- Add more plots here: -->
-        <li><a href="ItalyPowerDemand_clean_Series2Vec.html" target="_blank">3D t-SNE of Embeddings ItalyPowerDemand (clean,Series2Vec)</a></li>
-        <li><a href="ItalyPowerDemand_clean_TS2Vec.html" target="_blank">3D t-SNE of Embeddings ItalyPowerDemand (clean,TS2Vec)</a></li>
-        <li><a href="ItalyPowerDemand_clean_TS-TCC.html" target="_blank">3D t-SNE of Embeddings ItalyPowerDemand (clean,TS-TCC)</a></li>
-    </ul>
+        <div class="dataset-section">
+            <h2><span class="emoji">🧪</span>ChlorineConcentration Dataset</h2>
+            <h3>Clean Samples</h3>
+            <ul>
+                <li><a href="ChlorineConcentration_clean_Series2Vec.html" target="_blank">Series2Vec Embeddings</a></li>
+                <li><a href="ChlorineConcentration_clean_TS-TCC.html" target="_blank">TS-TCC Embeddings</a></li>
+                <li><a href="ChlorineConcentration_clean_TS2Vec.html" target="_blank">TS2Vec Embeddings</a></li>
+            </ul>
+            
+            <h3>PGD Adversarial Samples</h3>
+            <ul>
+                <li><a href="ChlorineConcentration_pgd_Series2Vec.html" target="_blank">Series2Vec Embeddings</a></li>
+                <li><a href="ChlorineConcentration_pgd_TS-TCC.html" target="_blank">TS-TCC Embeddings</a></li>
+                <li><a href="ChlorineConcentration_pgd_TS2Vec.html" target="_blank">TS2Vec Embeddings</a></li>
+            </ul>
+        </div>
 
-    <div class="caption">
-        For questions or data/code, see the <a href="https://github.com/JesseK18/tsc_ar" target="_blank">project repository</a>.
+        <div class="dataset-section">
+            <h2><span class="emoji">⚡</span>ItalyPowerDemand Dataset</h2>
+            <h3>Clean Samples</h3>
+            <ul>
+                <li><a href="ItalyPowerDemand_clean_Series2Vec.html" target="_blank">Series2Vec Embeddings</a></li>
+                <li><a href="ItalyPowerDemand_clean_TS-TCC.html" target="_blank">TS-TCC Embeddings</a></li>
+                <li><a href="ItalyPowerDemand_clean_TS2Vec.html" target="_blank">TS2Vec Embeddings</a></li>
+            </ul>
+            
+            <h3>PGD Adversarial Samples</h3>
+            <ul>
+                <li><a href="ItalyPowerDemand_pgd_Series2Vec.html" target="_blank">Series2Vec Embeddings</a></li>
+                <li><a href="ItalyPowerDemand_pgd_TS-TCC.html" target="_blank">TS-TCC Embeddings</a></li>
+                <li><a href="ItalyPowerDemand_pgd_TS2Vec.html" target="_blank">TS2Vec Embeddings</a></li>
+            </ul>
+        </div>
+
+        <div class="caption">
+            <span class="emoji">📊</span>For questions or data/code, see the <a href="https://github.com/JesseK18/tsc_ar" target="_blank">project repository</a>.
+        </div>
     </div>
 </body>
 </html>
